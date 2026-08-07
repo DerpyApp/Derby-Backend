@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using PadelBooking.DAL.Entities;
 
 namespace PadelBooking.DAL.Models
 {
@@ -30,13 +31,13 @@ namespace PadelBooking.DAL.Models
         public ICollection<TournamentRegistration> TournamentRegistrations { get; set; }
             = new HashSet<TournamentRegistration>();
 
-        public ICollection<Match> TeamAMatches { get; set; }
-            = new HashSet<Match>();
+        public ICollection<PadelBooking.DAL.Entities.Match> TeamAMatches { get; set; }
+            = new HashSet<PadelBooking.DAL.Entities.Match>();
 
-        public ICollection<Match> TeamBMatches { get; set; }
-            = new HashSet<Match>();
+        public ICollection<PadelBooking.DAL.Entities.Match> TeamBMatches { get; set; }
+            = new HashSet<PadelBooking.DAL.Entities.Match>();
 
-        public ICollection<Match> WonMatches { get; set; }
-            = new HashSet<Match>();
+        public ICollection<PadelBooking.DAL.Entities.Match> WonMatches { get; set; }
+            = new HashSet<PadelBooking.DAL.Entities.Match>();
     }
 }

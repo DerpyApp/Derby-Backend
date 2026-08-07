@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using PadelBooking.DAL.Enums;
 using PadelBooking.DAL.Models;
 
 namespace PadelBooking.DAL.Entities;
