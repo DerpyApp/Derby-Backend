@@ -5,8 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PadelBooking.API.Data;
 using PadelBooking.API.Helpers;
-using PadelBooking.API.Models;
-using PadelBooking.API.Services;
 using System.Text;
 
 namespace PadelBooking.API
@@ -56,10 +54,7 @@ namespace PadelBooking.API
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // 2. إضافة Identity
-            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
+            
 
             // 3. ربط إعدادات الـ JWT من appsettings.json
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JWT"));
@@ -87,9 +82,7 @@ namespace PadelBooking.API
                 };
             });
 
-            // 5. تسجيل الـ AuthService في الـ Dependency Injection
-            builder.Services.AddScoped<IAuthService, AuthService>();
-            builder.Services.AddScoped<IUserService, UserService>(); 
+           
 
             var app = builder.Build();
 
