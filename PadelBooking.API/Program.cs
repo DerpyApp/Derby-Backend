@@ -50,11 +50,16 @@ namespace PadelBooking.API
     });
             });
 
+            //// 1. إضافة DbContext
+            //builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            //    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
             // 1. إضافة DbContext
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-            
+                options.UseSqlServer(
+                    builder.Configuration.GetConnectionString("DefaultConnection"),
+                    sqlOptions => sqlOptions.MigrationsAssembly("PadelBooking.API")
+                ));
 
             // 3. ربط إعدادات الـ JWT من appsettings.json
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JWT"));
