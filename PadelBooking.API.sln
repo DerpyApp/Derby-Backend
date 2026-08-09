@@ -5,9 +5,11 @@ VisualStudioVersion = 17.14.36623.8
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PadelBooking.API", "PadelBooking.API\PadelBooking.API.csproj", "{F281E846-54D8-4CBA-8324-20C8190E41C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PadelBooking.BLL", "PadelBooking.BLL\PadelBooking.BLL.csproj", "{B2FFF295-6EBB-420A-B1C4-5845C1FC6027}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PadelBooking.DAL", "PadelBooking.DAL\PadelBooking.DAL.csproj", "{832CBEFC-0445-4BF7-8B3F-90084B6700FE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PadelBooking.BLL", "PadelBooking.BLL\PadelBooking.BLL.csproj", "{B332DCE1-72F7-ADF2-2473-BD28E9B439D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PadelBooking.DAL", "PadelBooking.DAL\PadelBooking.DAL.csproj", "{F8EF5E56-7AF0-61F0-CA69-9512573FB9C3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,14 +21,14 @@ Global
 		{F281E846-54D8-4CBA-8324-20C8190E41C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F281E846-54D8-4CBA-8324-20C8190E41C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F281E846-54D8-4CBA-8324-20C8190E41C7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B2FFF295-6EBB-420A-B1C4-5845C1FC6027}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B2FFF295-6EBB-420A-B1C4-5845C1FC6027}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B2FFF295-6EBB-420A-B1C4-5845C1FC6027}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B2FFF295-6EBB-420A-B1C4-5845C1FC6027}.Release|Any CPU.Build.0 = Release|Any CPU
-		{832CBEFC-0445-4BF7-8B3F-90084B6700FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{832CBEFC-0445-4BF7-8B3F-90084B6700FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{832CBEFC-0445-4BF7-8B3F-90084B6700FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{832CBEFC-0445-4BF7-8B3F-90084B6700FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B332DCE1-72F7-ADF2-2473-BD28E9B439D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B332DCE1-72F7-ADF2-2473-BD28E9B439D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B332DCE1-72F7-ADF2-2473-BD28E9B439D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B332DCE1-72F7-ADF2-2473-BD28E9B439D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8EF5E56-7AF0-61F0-CA69-9512573FB9C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8EF5E56-7AF0-61F0-CA69-9512573FB9C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8EF5E56-7AF0-61F0-CA69-9512573FB9C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8EF5E56-7AF0-61F0-CA69-9512573FB9C3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
