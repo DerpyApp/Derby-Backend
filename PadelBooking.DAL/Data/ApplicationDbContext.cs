@@ -40,6 +40,7 @@ namespace PadelBooking.API.Data
         public DbSet<BookingCoupon> BookingCoupons { get; set; }
 
         //Courts
+        public DbSet<Court> Courts { get; set; }
 
         public DbSet<CourtImage> CourtImages { get; set; }
 
