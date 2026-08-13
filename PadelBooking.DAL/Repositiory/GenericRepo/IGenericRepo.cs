@@ -20,6 +20,8 @@ namespace PadelBooking.DAL.Repositiory.GenericRepo
         Task UpdateAsync(T entity); // بتحدث عنصر موجود في الجدول.
         Task DeleteAsync(T entity); // بتشيل عنصر موجود في الجدول.
         Task DeleteRangeAsync(IEnumerable<T> entities); // بتشيل مجموعة عناصر موجودة في الجدول.
+        Task SaveChangesAsync(); // بتسجل التغيرات اللي حصلت في الجدول في قاعدة البيانات.
+
 
     }
 }

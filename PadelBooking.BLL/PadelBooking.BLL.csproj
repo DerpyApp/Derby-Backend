@@ -10,15 +10,11 @@
     <PackageReference Include="AutoMapper" Version="16.2.0" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="8.0.29" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PadelBooking.DAL\PadelBooking.DAL.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="DTOs\" />
-    <Folder Include="Services\User\" />
   </ItemGroup>
 
 </Project>

@@ -17,5 +17,7 @@ namespace PadelBooking.DAL.Repositiory.UserRepo
         }
 
         public async Task<User?> GetUserByEmailAsync(string email) => await _dbset.FirstOrDefaultAsync(u => u.Email == email);
+
+       
     }
 }

@@ -1,3 +1,4 @@
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -5,7 +6,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PadelBooking.API.Data;
 using PadelBooking.API.Helpers;
-using System.Text;
+using PadelBooking.BLL.Services.Token;
+using PadelBooking.BLL.Services.User;
+using PadelBooking.DAL.Repositiory.RoleRepo;
+using PadelBooking.DAL.Repositiory.UserRepo;
 
 namespace PadelBooking.API
 {
@@ -49,6 +53,13 @@ namespace PadelBooking.API
         }
     });
             });
+
+            builder.Services.AddScoped<IUserRepo, UserRepo>();
+            builder.Services.AddScoped<IRoleRepo, RoleRepo>();
+
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 
             //// 1. إضافة DbContext
             //builder.Services.AddDbContext<ApplicationDbContext>(options =>

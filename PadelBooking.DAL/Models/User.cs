@@ -20,6 +20,10 @@ namespace PadelBooking.DAL.Models
         public bool IsVerified { get; set; }
         public UserStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiryTime { get; set; }
+        public string? PasswordResetToken { get; set; }
+        public DateTime? PasswordResetTokenExpiryTime { get; set; }
 
         // Navigation properties
         public ICollection<Booking> Bookings { get; set; } = new HashSet<Booking>();
