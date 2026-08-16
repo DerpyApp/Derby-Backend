@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PadelBooking.API.Data;
+using PadelBooking.DAL.Data;
 using PadelBooking.DAL.Entities;
 using PadelBooking.DAL.Models;
 using PadelBooking.DAL.Repositiory.GenericRepo;

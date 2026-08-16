@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using PadelBooking.API.Data;
+using PadelBooking.DAL.Data;
 
 namespace PadelBooking.DAL.Repositiory.GenericRepo
 {
@@ -18,6 +18,8 @@ namespace PadelBooking.DAL.Repositiory.GenericRepo
             _context = context;
             _dbset = _context.Set<T>();
         }
+
+
         public async Task AddAsync(T entity)
         {
             await _dbset.AddAsync(entity);

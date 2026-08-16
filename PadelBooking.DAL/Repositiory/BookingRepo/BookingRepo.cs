@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using PadelBooking.API.Data;
+using PadelBooking.DAL.Data;
 using PadelBooking.DAL.Repositiory.GenericRepo;
 
 namespace PadelBooking.DAL.Repositiory.Booking
@@ -13,7 +13,9 @@ namespace PadelBooking.DAL.Repositiory.Booking
     {
         public BookingRepo(ApplicationDbContext context) : base(context)
         {
+
         }
+        
 
         public async Task<IEnumerable<Models.Booking>> GetBookingsByUserIdAsync(int userId)
         {

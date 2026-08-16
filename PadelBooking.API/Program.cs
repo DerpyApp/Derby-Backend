@@ -4,10 +4,15 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using PadelBooking.API.Data;
+using PadelBooking.DAL.Data;
 using PadelBooking.API.Helpers;
+using PadelBooking.BLL.Services.Club;
 using PadelBooking.BLL.Services.Token;
 using PadelBooking.BLL.Services.User;
+using PadelBooking.DAL.Repositiory.Booking;
+using PadelBooking.DAL.Repositiory.ClubRepo;
+using PadelBooking.DAL.Repositiory.CourtRepo;
+using PadelBooking.DAL.Repositiory.CourtScheduleRepo;
 using PadelBooking.DAL.Repositiory.RoleRepo;
 using PadelBooking.DAL.Repositiory.UserRepo;
 
@@ -56,10 +61,15 @@ namespace PadelBooking.API
 
             builder.Services.AddScoped<IUserRepo, UserRepo>();
             builder.Services.AddScoped<IRoleRepo, RoleRepo>();
-
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+
+            builder.Services.AddScoped<IClubRepo, ClubRepo>();
+            builder.Services.AddScoped<ICourtRepo, CourtRepo>();
+            builder.Services.AddScoped<ICourtScheduleRepo, CourtScheduleRepo>();
+            builder.Services.AddScoped<IBookingRepo, BookingRepo>();
+            builder.Services.AddScoped<IClubService, ClubService>();
 
             //// 1. إضافة DbContext
             //builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -67,10 +77,10 @@ namespace PadelBooking.API
 
             // 1. إضافة DbContext
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    builder.Configuration.GetConnectionString("DefaultConnection"),
-                    sqlOptions => sqlOptions.MigrationsAssembly("PadelBooking.API")
-                ));
+            options.UseSqlServer(
+             builder.Configuration.GetConnectionString("DefaultConnection"),
+            sqlOptions => sqlOptions.MigrationsAssembly("PadelBooking.DAL")
+            ));
 
             // 3. ربط إعدادات الـ JWT من appsettings.json
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JWT"));
@@ -93,7 +103,7 @@ namespace PadelBooking.API
                     ValidateLifetime = true,
                     ValidIssuer = builder.Configuration["JWT:Issuer"],
                     ValidAudience = builder.Configuration["JWT:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"]!)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]!)),
                     ClockSkew = TimeSpan.Zero
                 };
             });

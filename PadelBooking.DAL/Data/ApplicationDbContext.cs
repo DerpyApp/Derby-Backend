@@ -2,7 +2,7 @@
 using PadelBooking.DAL.Entities;
 using PadelBooking.DAL.Models;
 
-namespace PadelBooking.API.Data
+namespace PadelBooking.DAL.Data
 {
     public class ApplicationDbContext : DbContext
     {
