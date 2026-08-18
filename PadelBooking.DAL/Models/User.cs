@@ -1,19 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using PadelBooking.DAL.Enums;
 
 namespace PadelBooking.DAL.Models
 {
-    public class User
+    public class User : IdentityUser<int>
     {
-        public int Id { get; set; }
         public string FullName { get; set; } = null;
-        public string Email { get; set; } = null;
-        public string PasswordHash { get; set; } = null;
-        public string PhoneNumber { get; set; } = null;
         public Gender gender { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public string? ProfileImage { get; set; }

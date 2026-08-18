@@ -20,7 +20,7 @@ namespace PadelBooking.API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -82,6 +82,10 @@ namespace PadelBooking.API
             sqlOptions => sqlOptions.MigrationsAssembly("PadelBooking.DAL")
             ));
 
+            builder.Services.AddIdentity<PadelBooking.DAL.Models.User, PadelBooking.DAL.Models.Role>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
             // 3. ربط إعدادات الـ JWT من appsettings.json
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JWT"));
 
@@ -123,6 +127,11 @@ namespace PadelBooking.API
             app.UseAuthorization();
 
             app.MapControllers();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                await DatabaseInitializer.InitializeDatabaseAsync(scope.ServiceProvider);
+            }
 
             app.Run();
         }

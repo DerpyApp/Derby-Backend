@@ -1,101 +1,81 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Azure.Core;
+using Microsoft.AspNetCore.Identity;
 using PadelBooking.BLL.DTOs.UserDTOs;
 using PadelBooking.BLL.Services.Token;
-using PadelBooking.DAL.Repositiory.RoleRepo;
-using PadelBooking.DAL.Repositiory.UserRepo;
+using PadelBooking.DAL.Models;
 
 namespace PadelBooking.BLL.Services.User
 {
     public class UserService : IUserService
     {
-        private readonly IUserRepo _userRepo;
-        private readonly IPasswordHasher _passwordHasher;
+        private readonly UserManager<DAL.Models.User> _userManager;
+        private readonly SignInManager<DAL.Models.User> _signInManager;
+        private readonly RoleManager<Role> _roleManager;
         private readonly ITokenService _tokenService;
-        private readonly IRoleRepo _roleRepo;
 
-        public UserService( IUserRepo userRepo , IPasswordHasher passwordHasher ,
-            ITokenService tokenService,IRoleRepo roleRepo)
+        public UserService(
+            UserManager<DAL.Models.User> userManager,
+            SignInManager<DAL.Models.User> signInManager,
+            RoleManager<Role> roleManager,
+            ITokenService tokenService)
         {
-            _userRepo = userRepo;
-            _passwordHasher = passwordHasher;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _roleManager = roleManager;
             _tokenService = tokenService;
-            _roleRepo = roleRepo;
         }
 
         public async Task ForgotPasswordAsync(ForgotPasswordDto dto)
         {
-            // find user by email
-            var user = await _userRepo.GetUserByEmailAsync(dto.Email);
-            if(user == null)
+            var user = await _userManager.FindByEmailAsync(dto.Email);
+            if (user == null)
             {
                 throw new Exception("User Not Found");
             }
 
-            // generate reset token
-            var resetToken =
-                _tokenService.GenerateRefreshToken();
+            var resetToken = _tokenService.GenerateRefreshToken();
 
-            // set reset token 
             user.PasswordResetToken = resetToken;
+            user.PasswordResetTokenExpiryTime = DateTime.UtcNow.AddMinutes(15);
 
-            // set token expiration
-            user.PasswordResetTokenExpiryTime =
-                DateTime.UtcNow.AddMinutes(15);
+            await _userManager.UpdateAsync(user);
 
-            // update user
-            await _userRepo.UpdateAsync(user);
-
-            // save changes
-            await _userRepo.SaveChangesAsync();
-
-            // Temporary: LaterWe Will send this token through Email
             Console.WriteLine($"Password Reset Token {resetToken}");
         }
 
-        
-
         public async Task<AuthResponseDto> LoginAsync(LoginDto dto)
         {
-            // Get User by Email
-            var user = await _userRepo.GetUserByEmailAsync(dto.Email);
-            if(user == null)
+            var user = await _userManager.FindByEmailAsync(dto.Email);
+            if (user == null)
             {
                 throw new Exception("Invalid email or password.");
             }
 
-            // Verify Password
-            var isPasswordValid = 
-                _passwordHasher.VerifyPassword(dto.Password, user.PasswordHash);
-            if(!isPasswordValid)
+            var result = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, lockoutOnFailure: false);
+            if (!result.Succeeded)
             {
                 throw new Exception("Invalid email or password.");
             }
 
-            //Check if user is active
-            if(user.Status != DAL.Enums.UserStatus.Active)
+            if (user.Status != DAL.Enums.UserStatus.Active)
             {
                 throw new Exception("User is not active.");
             }
 
-
-            // Generate Tokens
             var refreshToken = _tokenService.GenerateRefreshToken();
             var refreshTokenExpiry = _tokenService.GetRefreshTokenExpiryTime();
 
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiryTime = refreshTokenExpiry;
 
-            //Update User
+            await _userManager.UpdateAsync(user);
 
-            await _userRepo.UpdateAsync(user);
-            await _userRepo.SaveChangesAsync();
+            var roles = await _userManager.GetRolesAsync(user);
+            var accessToken = _tokenService.GenerateAccessToken(user, roles.ToList());
 
-            // Return Response
             return new AuthResponseDto
             {
                 User = new UserDto
@@ -111,70 +91,54 @@ namespace PadelBooking.BLL.Services.User
                     Gender = user.gender,
                     DateOfBirth = user.DateOfBirth,
                 },
-                AccessToken = _tokenService.GenerateAccessToken(user.Id),
-                RefreshToken = _tokenService.GenerateRefreshToken()
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
             };
         }
 
         public async Task LogoutAsync(int userId)
         {
-            // Get User
-            var user = await _userRepo.GetByIdAsync(userId);
-            if(user == null)
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
             {
                 throw new Exception("User not found");
             }
 
-            // revoke refresh token
             user.RefreshToken = null;
             user.RefreshTokenExpiryTime = null;
 
-            // save changes
-            await _userRepo.UpdateAsync(user);
-            await _userRepo.SaveChangesAsync();
+            await _userManager.UpdateAsync(user);
         }
 
         public async Task<AuthResponseDto> RefreshTokenAsync(RefreshTokenDto dto)
         {
-            // find user by refresh token
-            var users =
-                await _userRepo.FindAsync(u => u.RefreshToken == dto.RefreshToken);
-            var user = users.FirstOrDefault();
+            var user = _userManager.Users.FirstOrDefault(u => u.RefreshToken == dto.RefreshToken);
             if (user == null)
             {
                 throw new Exception("Invalid refresh token.");
             }
 
-            // Check if refresh token is expired
-            if (user.RefreshTokenExpiryTime == null ||
-                user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            if (user.RefreshTokenExpiryTime == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
             {
                 throw new Exception("Refresh token has expired.");
             }
 
-            //check user status 
             if (user.Status != DAL.Enums.UserStatus.Active)
             {
                 throw new Exception("User is not active.");
             }
 
-            // generate new tokens
-            var newAccessToken =
-                _tokenService.GenerateAccessToken(user.Id);
-            var newRefreshToken =
-                _tokenService.GenerateRefreshToken();
-            var newRefreshTokenExpiry =
-                _tokenService.GetRefreshTokenExpiryTime();
+            var newRefreshToken = _tokenService.GenerateRefreshToken();
+            var newRefreshTokenExpiry = _tokenService.GetRefreshTokenExpiryTime();
 
-            // update user with new refresh token and expiry time
             user.RefreshToken = newRefreshToken;
             user.RefreshTokenExpiryTime = newRefreshTokenExpiry;
 
-            // save changes to database
-            await _userRepo.UpdateAsync(user);
-            await _userRepo.SaveChangesAsync();
+            await _userManager.UpdateAsync(user);
 
-            // return response
+            var roles = await _userManager.GetRolesAsync(user);
+            var newAccessToken = _tokenService.GenerateAccessToken(user, roles.ToList());
+
             return new AuthResponseDto
             {
                 User = new UserDto
@@ -194,62 +158,48 @@ namespace PadelBooking.BLL.Services.User
                 RefreshToken = newRefreshToken
             };
         }
-                
-            
 
         public async Task<AuthResponseDto> RegisterAsync(RegisterUserDto dto)
         {
-            //  check if email already exists
-            var existingUser = await _userRepo.GetUserByEmailAsync(dto.Email);
-            if(existingUser != null)
+            var existingUser = await _userManager.FindByEmailAsync(dto.Email);
+            if (existingUser != null)
             {
                 throw new Exception("Email already exists.");
             }
 
-
-            // Get Role for the new user
-            var role = await _roleRepo.GetRoleByNameAsync(dto.Role);
-            if (role == null)
+            var roleExists = await _roleManager.RoleExistsAsync(dto.Role);
+            if (!roleExists)
+            {
                 throw new Exception("Role not found.");
+            }
 
-
-            // create new user entity
+            var refreshToken = _tokenService.GenerateRefreshToken();
+            var refreshTokenExpiry = _tokenService.GetRefreshTokenExpiryTime();
 
             var user = new DAL.Models.User
             {
+                UserName = dto.Email,
                 Email = dto.Email,
                 FullName = dto.Name,
                 PhoneNumber = dto.Phone,
-                PasswordHash = _passwordHasher.HashPassword(dto.Password),
                 IsVerified = false,
                 Status = DAL.Enums.UserStatus.Active,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                RefreshToken = refreshToken,
+                RefreshTokenExpiryTime = refreshTokenExpiry
             };
 
-            // Create Refresh Token
-            var refreshToken = _tokenService.GenerateRefreshToken();
-            var refreshTokenExpiry = _tokenService.GetRefreshTokenExpiryTime();
-            user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = refreshTokenExpiry;
-
-
-            //  create user role relationship
-            var userRole = new DAL.Models.UserRole
+            var result = await _userManager.CreateAsync(user, dto.Password);
+            if (!result.Succeeded)
             {
-                User = user,
-                Role = role
-            };
+                throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
+            }
 
-            user.UserRoles.Add(userRole);
+            await _userManager.AddToRoleAsync(user, dto.Role);
 
-            //  add user to database
-            await _userRepo.AddAsync(user);
+            var roles = await _userManager.GetRolesAsync(user);
+            var accessToken = _tokenService.GenerateAccessToken(user, roles.ToList());
 
-
-            //  save changes to database
-            await _userRepo.SaveChangesAsync();
-
-            //  return response
             return new AuthResponseDto
             {
                 User = new UserDto
@@ -263,46 +213,44 @@ namespace PadelBooking.BLL.Services.User
                     DateOfBirth = user.DateOfBirth,
                     ProfileImage = user.ProfileImage,
                     CreatedAt = user.CreatedAt,
-                    PhoneNumber= user.PhoneNumber,
+                    PhoneNumber = user.PhoneNumber,
                 },
-                AccessToken = _tokenService.GenerateAccessToken(user.Id),
-                RefreshToken = _tokenService.GenerateRefreshToken()
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
             };
-
-
         }
 
         public async Task ResetPasswordAsync(ResetPasswordDto dto)
         {
-            // find user by reset token
-            var users = await _userRepo.FindAsync
-                (u => u.PasswordResetToken == dto.ResetToken);
-            var user = users.FirstOrDefault();
-            if(user ==  null)
+            var user = _userManager.Users.FirstOrDefault(u => u.PasswordResetToken == dto.ResetToken);
+            if (user == null)
             {
                 throw new Exception("Invalid reset token");
             }
 
-            // check token expiration
-            if(user.PasswordResetTokenExpiryTime == null
-                || user.PasswordResetTokenExpiryTime <= DateTime.UtcNow)
+            if (user.PasswordResetTokenExpiryTime == null || user.PasswordResetTokenExpiryTime <= DateTime.UtcNow)
             {
                 throw new Exception("Resst token has Expired");
             }
 
-            // hash new password
-            user.PasswordHash = _passwordHasher.HashPassword(dto.NewPassword);
+            var removePasswordResult = await _userManager.RemovePasswordAsync(user);
+            if (!removePasswordResult.Succeeded)
+            {
+                var removeErrors = string.Join(", ", removePasswordResult.Errors.Select(e => e.Description));
+                
+                // If it fails, maybe the user has no password. Let's ignore it if the user has no password.
+            }
 
+            var addPasswordResult = await _userManager.AddPasswordAsync(user, dto.NewPassword);
+            if (!addPasswordResult.Succeeded)
+            {
+                throw new Exception("Failed to set new password");
+            }
 
-            //clear reset token 
             user.PasswordResetToken = null;
             user.PasswordResetTokenExpiryTime = null;
 
-            // Update User
-            await _userRepo.UpdateAsync(user);
-
-            // Save Changes 
-            await _userRepo.SaveChangesAsync();
+            await _userManager.UpdateAsync(user);
         }
     }
 }

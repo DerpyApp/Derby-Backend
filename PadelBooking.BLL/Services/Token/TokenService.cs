@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -20,7 +20,7 @@ namespace PadelBooking.BLL.Services.Token
             _configuration = configuration;
         }
 
-        public string GenerateAccessToken(int userId)
+        public string GenerateAccessToken(DAL.Models.User user, IList<string> roles)
         {
             var jwtSettings = _configuration.GetSection("Jwt");
             var key = jwtSettings["Key"]
@@ -34,11 +34,16 @@ namespace PadelBooking.BLL.Services.Token
             var claims = new List<Claim>
             {
                 new Claim(
-                    JwtRegisteredClaimNames.Sub, userId.ToString()),
+                    JwtRegisteredClaimNames.Sub, user.Id.ToString()),
 
                 new Claim(
                     JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
+
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             var securityKey =
                 new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
