@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PadelBooking.DAL.Constants;
 using PadelBooking.DAL.Models;
 using System;
 using System.Threading.Tasks;
@@ -19,9 +20,7 @@ namespace PadelBooking.DAL.Data
 
             await context.Database.MigrateAsync();
 
-            string[] roles = { "Player", "ClubOwner", "Admin" };
-
-            foreach (var roleName in roles)
+            foreach (var roleName in AppRoles.All)
             {
                 var roleExists = await roleManager.RoleExistsAsync(roleName);
                 if (!roleExists)
