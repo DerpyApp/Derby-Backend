@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using PadelBooking.BLL.DTOs.UserDTOs;
+using PadelBooking.BLL.Exceptions;
 using PadelBooking.BLL.Services.Token;
 using PadelBooking.DAL.Models;
 
@@ -33,7 +34,7 @@ namespace PadelBooking.BLL.Services.User
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
             {
-                throw new Exception("User Not Found");
+                throw new NotFoundException("User not found.");
             }
 
             var resetToken = _tokenService.GenerateRefreshToken();
@@ -51,18 +52,18 @@ namespace PadelBooking.BLL.Services.User
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
             {
-                throw new Exception("Invalid email or password.");
+                throw new UnauthorizedException("Invalid email or password.");
             }
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, lockoutOnFailure: false);
             if (!result.Succeeded)
             {
-                throw new Exception("Invalid email or password.");
+                throw new UnauthorizedException("Invalid email or password.");
             }
 
             if (user.Status != DAL.Enums.UserStatus.Active)
             {
-                throw new Exception("User is not active.");
+                throw new ForbiddenException("User is not active.");
             }
 
             var refreshToken = _tokenService.GenerateRefreshToken();
@@ -101,7 +102,7 @@ namespace PadelBooking.BLL.Services.User
             var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null)
             {
-                throw new Exception("User not found");
+                throw new NotFoundException("User not found.");
             }
 
             user.RefreshToken = null;
@@ -115,17 +116,17 @@ namespace PadelBooking.BLL.Services.User
             var user = _userManager.Users.FirstOrDefault(u => u.RefreshToken == dto.RefreshToken);
             if (user == null)
             {
-                throw new Exception("Invalid refresh token.");
+                throw new UnauthorizedException("Invalid refresh token.");
             }
 
             if (user.RefreshTokenExpiryTime == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
             {
-                throw new Exception("Refresh token has expired.");
+                throw new UnauthorizedException("Refresh token has expired.");
             }
 
             if (user.Status != DAL.Enums.UserStatus.Active)
             {
-                throw new Exception("User is not active.");
+                throw new ForbiddenException("User is not active.");
             }
 
             var newRefreshToken = _tokenService.GenerateRefreshToken();
@@ -164,13 +165,13 @@ namespace PadelBooking.BLL.Services.User
             var existingUser = await _userManager.FindByEmailAsync(dto.Email);
             if (existingUser != null)
             {
-                throw new Exception("Email already exists.");
+                throw new ConflictException("Email already exists.");
             }
 
             var roleExists = await _roleManager.RoleExistsAsync(dto.Role);
             if (!roleExists)
             {
-                throw new Exception("Role not found.");
+                throw new NotFoundException("Role not found.");
             }
 
             var refreshToken = _tokenService.GenerateRefreshToken();
@@ -192,7 +193,7 @@ namespace PadelBooking.BLL.Services.User
             var result = await _userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded)
             {
-                throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
+                throw new BadRequestException(string.Join(", ", result.Errors.Select(e => e.Description)));
             }
 
             await _userManager.AddToRoleAsync(user, dto.Role);
@@ -225,12 +226,12 @@ namespace PadelBooking.BLL.Services.User
             var user = _userManager.Users.FirstOrDefault(u => u.PasswordResetToken == dto.ResetToken);
             if (user == null)
             {
-                throw new Exception("Invalid reset token");
+                throw new UnauthorizedException("Invalid reset token.");
             }
 
             if (user.PasswordResetTokenExpiryTime == null || user.PasswordResetTokenExpiryTime <= DateTime.UtcNow)
             {
-                throw new Exception("Resst token has Expired");
+                throw new UnauthorizedException("Reset token has expired.");
             }
 
             var removePasswordResult = await _userManager.RemovePasswordAsync(user);
@@ -244,7 +245,7 @@ namespace PadelBooking.BLL.Services.User
             var addPasswordResult = await _userManager.AddPasswordAsync(user, dto.NewPassword);
             if (!addPasswordResult.Succeeded)
             {
-                throw new Exception("Failed to set new password");
+                throw new BadRequestException("Failed to set new password.");
             }
 
             user.PasswordResetToken = null;

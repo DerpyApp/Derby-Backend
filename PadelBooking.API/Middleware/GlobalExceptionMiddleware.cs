@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using PadelBooking.BLL.Exceptions;
 
 namespace PadelBooking.API.Middleware
 {
@@ -25,8 +26,26 @@ namespace PadelBooking.API.Middleware
             {
                 await _next(context);
             }
+            catch (AppException ex)
+            {
+                // Known application exceptions → return the correct status code and message
+                _logger.LogWarning(ex, "Application exception: {Message}", ex.Message);
+
+                context.Response.ContentType = "application/json";
+                context.Response.StatusCode = (int)ex.StatusCode;
+
+                var response = new
+                {
+                    StatusCode = (int)ex.StatusCode,
+                    ex.Message
+                };
+
+                var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+                await context.Response.WriteAsync(JsonSerializer.Serialize(response, options));
+            }
             catch (Exception ex)
             {
+                // Unexpected exceptions → 500
                 _logger.LogError(ex, "Unhandled exception: {Message}", ex.Message);
 
                 context.Response.ContentType = "application/json";
@@ -54,9 +73,7 @@ namespace PadelBooking.API.Middleware
                 }
 
                 var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-                var json = JsonSerializer.Serialize(response, options);
-
-                await context.Response.WriteAsync(json);
+                await context.Response.WriteAsync(JsonSerializer.Serialize(response, options));
             }
         }
     }

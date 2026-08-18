@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PadelBooking.BLL.DTOs.BookingDTOs;
+using PadelBooking.BLL.Exceptions;
 using PadelBooking.DAL.Repositiory.Booking;
 using PadelBooking.DAL.Repositiory.ClubRepo;
 using PadelBooking.DAL.Repositiory.CourtRepo;
@@ -44,38 +45,38 @@ namespace PadelBooking.BLL.Services.Booking
             // Validate date and time
             if(dto.Date.Date < DateTime.UtcNow.Date)
             {
-                throw new Exception("Booking date can't be in the Past");
+                throw new BadRequestException("Booking date can't be in the past.");
             }
 
             if(dto.StartTime >= dto.EndTime)
             {
-                throw new Exception("Start time must be before end time");
+                throw new BadRequestException("Start time must be before end time.");
             }
 
             // Get the club
             var club = await _clubRepo.GetByIdAsync(dto.FacilityId);
             if(club == null)
             {
-                throw new Exception("club not found");
+                throw new NotFoundException("Club not found.");
             }
 
             // get the court with its club
             var court = await _courtRepo.GetCourtWithClubAsync(dto.CourtId);
             if(court == null)
             {
-                throw new Exception("Court not found");
+                throw new NotFoundException("Court not found.");
             }
 
             // make sure the court belongs to the selected club
             if(court.ClubId != dto.FacilityId)
             {
-                throw new Exception("This court doesn't belongs to the selected club");
+                throw new BadRequestException("This court doesn't belong to the selected club.");
             }
 
             // check court status
             if(court.Status != DAL.Enums.CourtStatus.Available)
             {
-                throw new Exception("this court isn't available");
+                throw new BadRequestException("This court isn't available.");
             }
 
             // check if the slot is already booked
@@ -83,7 +84,7 @@ namespace PadelBooking.BLL.Services.Booking
                 dto.Date, dto.StartTime, dto.EndTime);
             if (isBooked)
             {
-                throw new Exception("this time slot is already booked");
+                throw new ConflictException("This time slot is already booked.");
             }
 
             // get the court schedule for this day
@@ -91,18 +92,18 @@ namespace PadelBooking.BLL.Services.Booking
                 dto.CourtId, dto.Date.DayOfWeek);
             if(schedule == null)
             {
-                throw new Exception("No schedule found for this day");
+                throw new NotFoundException("No schedule found for this day.");
             }
             if (!schedule.IsAvailable)
             {
-                throw new Exception("The court is not available on this day.");
+                throw new BadRequestException("The court is not available on this day.");
             }
 
             // Make sure requested time is inside the court schedule
             if (dto.StartTime < schedule.StartTime ||
                  dto.EndTime > schedule.EndTime)
             {
-                throw new Exception("Selected time is outside the court schedule.");
+                throw new BadRequestException("Selected time is outside the court schedule.");
             }
 
             // Calculate total price
