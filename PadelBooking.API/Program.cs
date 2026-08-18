@@ -15,6 +15,7 @@ using PadelBooking.DAL.Repositiory.CourtRepo;
 using PadelBooking.DAL.Repositiory.CourtScheduleRepo;
 using PadelBooking.DAL.Repositiory.RoleRepo;
 using PadelBooking.DAL.Repositiory.UserRepo;
+using PadelBooking.API.Middleware;
 
 namespace PadelBooking.API
 {
@@ -115,6 +116,9 @@ namespace PadelBooking.API
            
 
             var app = builder.Build();
+
+            // Global exception handling
+            app.UseMiddleware<GlobalExceptionMiddleware>();
 
             // Configure the HTTP request pipeline.
             app.UseSwagger();
