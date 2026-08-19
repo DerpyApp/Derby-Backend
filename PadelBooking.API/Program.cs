@@ -4,18 +4,20 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using PadelBooking.DAL.Data;
 using PadelBooking.API.Helpers;
+using PadelBooking.API.Middleware;
 using PadelBooking.BLL.Services.Club;
+using PadelBooking.BLL.Services.Notification;
 using PadelBooking.BLL.Services.Token;
 using PadelBooking.BLL.Services.User;
+using PadelBooking.DAL.Data;
 using PadelBooking.DAL.Repositiory.Booking;
 using PadelBooking.DAL.Repositiory.ClubRepo;
 using PadelBooking.DAL.Repositiory.CourtRepo;
 using PadelBooking.DAL.Repositiory.CourtScheduleRepo;
+using PadelBooking.DAL.Repositiory.NotificationRepo;
 using PadelBooking.DAL.Repositiory.RoleRepo;
 using PadelBooking.DAL.Repositiory.UserRepo;
-using PadelBooking.API.Middleware;
 
 namespace PadelBooking.API
 {
@@ -71,6 +73,8 @@ namespace PadelBooking.API
             builder.Services.AddScoped<ICourtScheduleRepo, CourtScheduleRepo>();
             builder.Services.AddScoped<IBookingRepo, BookingRepo>();
             builder.Services.AddScoped<IClubService, ClubService>();
+            builder.Services.AddScoped<INotificationRepo, NotificationRepo>();
+            builder.Services.AddScoped<INotififcationService ,  NotificationService>();
 
             //// 1. إضافة DbContext
             //builder.Services.AddDbContext<ApplicationDbContext>(options =>
