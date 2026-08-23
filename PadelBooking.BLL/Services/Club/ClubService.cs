@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using PadelBooking.BLL.DTOs.ClubDTOs;
 using PadelBooking.DAL.Repositiory.Booking;
@@ -20,7 +19,12 @@ namespace PadelBooking.BLL.Services.Club
         private readonly IBookingRepo _bookingRepo;
         private readonly ICourtBlockRepo _courtBlockRepo;
 
-        public ClubService(IClubRepo clubRepo , ICourtRepo courtRepo , ICourtScheduleRepo courtScheduleRepo , IBookingRepo bookingRepo, ICourtBlockRepo courtBlockRepo)
+        public ClubService(
+            IClubRepo clubRepo,
+            ICourtRepo courtRepo,
+            ICourtScheduleRepo courtScheduleRepo,
+            IBookingRepo bookingRepo,
+            ICourtBlockRepo courtBlockRepo)
         {
             _clubRepo = clubRepo;
             _courtRepo = courtRepo;
@@ -36,15 +40,36 @@ namespace PadelBooking.BLL.Services.Club
 
             foreach (var club in clubs)
             {
-                var courts = await _courtRepo.GetCourtsByClubAsync(club.Id);
-                var hasMatchingCourt = courts.Any(c =>
-                (!dto.MinPrice.HasValue || c.PricePerHour >= dto.MinPrice.Value) &&
-                (!dto.MaxPrice.HasValue || c.PricePerHour <= dto.MaxPrice.Value));
+                var courts = (await _courtRepo.GetCourtsByClubAsync(club.Id)).ToList();
 
-                if (!hasMatchingCourt)
+                // City / Location filter
+                if (!string.IsNullOrWhiteSpace(dto.City) &&
+                    !club.Address.Contains(dto.City, StringComparison.OrdinalIgnoreCase) &&
+                    !club.Name.Contains(dto.City, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
+
+                // Search term filter
+                if (!string.IsNullOrWhiteSpace(dto.SearchTerm) &&
+                    !club.Name.Contains(dto.SearchTerm, StringComparison.OrdinalIgnoreCase) &&
+                    !(club.Description != null && club.Description.Contains(dto.SearchTerm, StringComparison.OrdinalIgnoreCase)) &&
+                    !club.Address.Contains(dto.SearchTerm, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                // Price filter
+                bool matchesPrice = courts.Count == 0 || courts.Any(c =>
+                    (!dto.MinPrice.HasValue || c.PricePerHour >= dto.MinPrice.Value) &&
+                    (!dto.MaxPrice.HasValue || c.PricePerHour <= dto.MaxPrice.Value));
+
+                if (!matchesPrice)
+                {
+                    continue;
+                }
+
+                decimal? minCourtPrice = courts.Count > 0 ? courts.Min(c => c.PricePerHour) : null;
 
                 result.Add(new ClubSearchResponseDto
                 {
@@ -54,11 +79,12 @@ namespace PadelBooking.BLL.Services.Club
                     Address = club.Address,
                     Latitude = club.Latitude,
                     Longitude = club.Longitude,
+                    StartingPrice = minCourtPrice,
                     Logo = club.Logo,
-                    CoverImage = club.CoverImage,
+                    CoverImage = club.CoverImage
                 });
-                
             }
+
             return result;
         }
 
@@ -82,8 +108,9 @@ namespace PadelBooking.BLL.Services.Club
         public async Task<ClubDetailsDto?> GetClubDetailsAsync(int clubId)
         {
             var club = await _clubRepo.GetClubWithCourtsAsync(clubId);
-            if(club == null)
+            if (club == null)
                 return null;
+
             var result = new ClubDetailsDto
             {
                 Id = club.Id,
@@ -116,81 +143,88 @@ namespace PadelBooking.BLL.Services.Club
                     })
                     .ToList()
             };
+
             return result;
         }
 
         public async Task<IEnumerable<CourtAvailabilityDto>> GetCourtAvailabilityAsync(int clubId, DateTime date)
         {
             var courts = await _courtRepo.GetCourtsByClubAsync(clubId);
-            // بنجيب كل الملاعب الخاصة بالنادي
             var availability = new List<CourtAvailabilityDto>();
-            //دي القائمة اللي هنحط فيها الـ slots اللي هنرجعها للـ API.
 
-            foreach (var court in courts) // يعني نفحص كل ملعب لوحده.
+            foreach (var court in courts)
             {
-                var schedules = 
-                    await _courtScheduleRepo.GetCourtSchedulesByCourtIdAsync(court.Id);
+                var schedules = await _courtScheduleRepo.GetCourtSchedulesByCourtIdAsync(court.Id);
+                var daySchedule = schedules.FirstOrDefault(s => s.DayOfWeek == date.DayOfWeek);
 
-                var daySchedule =
-                    schedules.FirstOrDefault(s => s.DayOfWeek == date.DayOfWeek);
-
-                if(daySchedule == null || !daySchedule.IsAvailable)
+                if (daySchedule == null || !daySchedule.IsAvailable)
                 {
                     continue;
                 }
 
                 var currentTime = daySchedule.StartTime;
-                while(currentTime < daySchedule.EndTime)
+                while (currentTime < daySchedule.EndTime)
                 {
                     var slotEndTime = currentTime.Add(TimeSpan.FromHours(1));
-                    if(slotEndTime > daySchedule.EndTime)
+                    if (slotEndTime > daySchedule.EndTime)
                     {
                         break;
                     }
 
-                    var isBooked = await _bookingRepo.IsSlotBookedAsync(
-                        court.Id, date, currentTime, slotEndTime);
+                    var isBooked = await _bookingRepo.IsSlotBookedAsync(court.Id, date, currentTime, slotEndTime);
+                    var isBlocked = _courtBlockRepo != null ? await _courtBlockRepo.IsBlockedAsync(court.Id, date, currentTime, slotEndTime) : false;
 
-                    var isBlocked = await _courtBlockRepo.IsBlockedAsync(
-                        court.Id, date, currentTime, slotEndTime);
                     availability.Add(new CourtAvailabilityDto
                     {
+                        CourtId = court.Id,
+                        CourtName = court.Name,
                         StartTime = currentTime,
                         EndTime = slotEndTime,
                         IsAvailable = !isBooked && !isBlocked,
                         Price = court.PricePerHour,
                         Deposit = court.PricePerHour * 0.5m
                     });
+
                     currentTime = slotEndTime;
                 }
             }
+
             return availability;
         }
 
         public async Task<IEnumerable<ClubSearchResponseDto>> SearchClubAsync(ClubSearchRequestDto dto)
         {
             var clubs = await _clubRepo.GetAllAsync();
-            var result = clubs
-                .Where(c => CalculateDistance(dto.Latitude,
-                dto.Longitude,
-                c.Latitude,
-                c.Longitude) <= dto.Radius)
-                .Select(c => new ClubSearchResponseDto
+            var searchResults = new List<ClubSearchResponseDto>();
+
+            double radius = dto.Radius > 0 ? dto.Radius : 10;
+
+            foreach (var club in clubs)
+            {
+                double dist = CalculateDistance(dto.Latitude, dto.Longitude, club.Latitude, club.Longitude);
+                if (dist <= radius)
                 {
-                    Id = c.Id,
-                    Name = c.Name,
-                    Description = c.Description,
-                    Address = c.Address,
-                    Latitude = c.Latitude,
-                    Logo = c.Logo,
-                    Longitude  = c.Longitude,
-                    CoverImage = c.CoverImage
-                })
-                .ToList();
-            return result;
+                    var courts = (await _courtRepo.GetCourtsByClubAsync(club.Id)).ToList();
+                    decimal? minPrice = courts.Count > 0 ? courts.Min(c => c.PricePerHour) : null;
+
+                    searchResults.Add(new ClubSearchResponseDto
+                    {
+                        Id = club.Id,
+                        Name = club.Name,
+                        Description = club.Description,
+                        Address = club.Address,
+                        Latitude = club.Latitude,
+                        Longitude = club.Longitude,
+                        DistanceKm = Math.Round(dist, 2),
+                        StartingPrice = minPrice,
+                        Logo = club.Logo,
+                        CoverImage = club.CoverImage
+                    });
+                }
+            }
+
+            return searchResults.OrderBy(r => r.DistanceKm);
         }
-
-
 
         private static double CalculateDistance(
             decimal userLatitude,
@@ -198,39 +232,33 @@ namespace PadelBooking.BLL.Services.Club
             decimal clubLatitude,
             decimal clubLongitude)
         {
-            
-                const double earthRadiusKm = 6371;
+            const double earthRadiusKm = 6371;
 
-                double lat1 = Convert.ToDouble(userLatitude);
-                double lon1 = Convert.ToDouble(userLongitude);
+            double lat1 = Convert.ToDouble(userLatitude);
+            double lon1 = Convert.ToDouble(userLongitude);
 
-                double lat2 = Convert.ToDouble(clubLatitude);
-                double lon2 = Convert.ToDouble(clubLongitude);
+            double lat2 = Convert.ToDouble(clubLatitude);
+            double lon2 = Convert.ToDouble(clubLongitude);
 
-                double dLat = DegreesToRadians(lat2 - lat1);
-                double dLon = DegreesToRadians(lon2 - lon1);
+            double dLat = DegreesToRadians(lat2 - lat1);
+            double dLon = DegreesToRadians(lon2 - lon1);
 
-                double a =
-                    Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
-                    Math.Cos(DegreesToRadians(lat1)) *
-                    Math.Cos(DegreesToRadians(lat2)) *
-                    Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+            double a =
+                Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                Math.Cos(DegreesToRadians(lat1)) *
+                Math.Cos(DegreesToRadians(lat2)) *
+                Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
 
-                double c = 2 * Math.Atan2(
-                    Math.Sqrt(a),
-                    Math.Sqrt(1 - a));
+            double c = 2 * Math.Atan2(
+                Math.Sqrt(a),
+                Math.Sqrt(1 - a));
 
-                return earthRadiusKm * c;
-            
+            return earthRadiusKm * c;
         }
-         
 
         private static double DegreesToRadians(double degrees)
         {
             return degrees * Math.PI / 180;
         }
-
-        
     }
-} 
-
+}

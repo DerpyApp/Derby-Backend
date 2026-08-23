@@ -1,6 +1,6 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PadelBooking.BLL.DTOs.BookingDTOs;
 using PadelBooking.BLL.Services.Booking;
@@ -19,9 +19,9 @@ namespace PadelBooking.API.Controllers
             _bookingService = bookingService;
         }
 
-        // POST: api/Booking
+        // POST: /api/bookings
         [HttpPost]
-        public async Task<IActionResult> CreateBooking(CreateBookingDto dto)
+        public async Task<IActionResult> CreateBooking([FromBody] CreateBookingDto dto)
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -35,8 +35,8 @@ namespace PadelBooking.API.Controllers
             return Ok(result);
         }
 
-        // GET: api/Booking/my-bookings
-        [HttpGet("my-bookings")]
+        // GET: /api/bookings/me 
+        [HttpGet("me")]
         public async Task<IActionResult> GetMyBookings()
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -51,8 +51,8 @@ namespace PadelBooking.API.Controllers
             return Ok(result);
         }
 
-        // GET: api/Booking/{id}
-        [HttpGet("{id}")]
+        // GET: /api/bookings/{id}
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetBookingDetails(int id)
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -67,8 +67,7 @@ namespace PadelBooking.API.Controllers
             return Ok(result);
         }
 
-        // PUT: api/Booking/{id}/cancel
-        [HttpPut("{id}/cancel")]
+        [HttpPut("{id:int}/cancel")]
         public async Task<IActionResult> CancelBooking(int id)
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -85,6 +84,5 @@ namespace PadelBooking.API.Controllers
                 Message = "Booking cancelled successfully."
             });
         }
-
     }
 }

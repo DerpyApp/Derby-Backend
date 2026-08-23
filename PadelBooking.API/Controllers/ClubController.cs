@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using PadelBooking.BLL.DTOs.ClubDTOs;
 using PadelBooking.BLL.Services.Club;
@@ -16,60 +17,50 @@ namespace PadelBooking.API.Controllers
             _clubService = clubService;
         }
 
-        //Get : api/facilities/search
-        // search for nearby clubs
         [HttpGet("search")]
-        public async Task<IActionResult> Search(
-            [FromQuery] ClubSearchRequestDto dto)
+        public async Task<IActionResult> Search([FromQuery] ClubSearchRequestDto dto)
         {
             var result = await _clubService.SearchClubAsync(dto);
             return Ok(result);
         }
 
-        //Get: api/facilities
-        //filter clubs by sport , city and price
         [HttpGet]
-        public async Task<IActionResult> Filter(
-            [FromQuery] ClubFilterRequestDto dto)
+        public async Task<IActionResult> Filter([FromQuery] ClubFilterRequestDto dto)
         {
             var result = await _clubService.FilterClubAsync(dto);
             return Ok(result);
         }
 
-        //Get : api/facilities/{id}
-        //Get club details
-        [HttpGet("{clubId}")]
-        public async Task<IActionResult> GetClubDetails(int clubId)
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetClubDetails(int id)
         {
-            var result = await _clubService.GetClubDetailsAsync(clubId);
-            if(result == null)
+            var result = await _clubService.GetClubDetailsAsync(id);
+            if (result == null)
             {
                 return NotFound(new
                 {
-                    Message = "Club not found."
+                    Message = "Facility/Club not found."
                 });
             }
             return Ok(result);
         }
 
-        //Get : api/facilities/{id}/availability
-        //Get real-time availability
-        [HttpGet("{clubId}/availability")]
-        public async Task<IActionResult> GetAvailability( int clubId,
-            [FromQuery] DateTime date)
+        [HttpGet("{id:int}/availability")]
+        public async Task<IActionResult> GetAvailability(int id, [FromQuery] DateTime date)
         {
-            var result = await _clubService.GetCourtAvailabilityAsync(
-                clubId, date);
+            if (date == default)
+            {
+                date = DateTime.UtcNow.Date;
+            }
 
+            var result = await _clubService.GetCourtAvailabilityAsync(id, date);
             return Ok(result);
         }
 
-        //Get : api/facilities/{id}/courts
-        //Get courts inside club
-        [HttpGet("{clubId}/courts")]
-        public async Task<IActionResult> GetCourts(int clubId)
+        [HttpGet("{id:int}/courts")]
+        public async Task<IActionResult> GetCourts(int id)
         {
-            var result = await _clubService.GetClubCourtsAsync(clubId);
+            var result = await _clubService.GetClubCourtsAsync(id);
             return Ok(result);
         }
     }
