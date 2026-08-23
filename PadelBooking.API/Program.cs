@@ -44,7 +44,6 @@ namespace PadelBooking.API
                 opt.AddDefaultPolicy(o =>
                     o.AllowAnyOrigin()
                      .AllowAnyHeader()
-                     .AllowCredentials()
                      .AllowAnyMethod()
                 );
             });
