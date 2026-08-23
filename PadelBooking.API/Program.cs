@@ -39,6 +39,16 @@ namespace PadelBooking.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSignalR();
 
+            builder.Services.AddCors(opt =>
+            {
+                opt.AddDefaultPolicy(o =>
+                    o.AllowAnyOrigin()
+                     .AllowAnyHeader()
+                     .AllowCredentials()
+                     .AllowAnyMethod()
+                );
+            });
+
             builder.Services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "PadelBooking API", Version = "v1" });
@@ -159,6 +169,8 @@ namespace PadelBooking.API
             app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
+
+            app.UseCors();
 
             app.UseAuthentication();
             app.UseAuthorization();
