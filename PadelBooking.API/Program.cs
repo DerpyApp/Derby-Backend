@@ -8,12 +8,14 @@ using PadelBooking.API.Helpers;
 using PadelBooking.API.Middleware;
 using PadelBooking.BLL.Services.Club;
 using PadelBooking.BLL.Services.Notification;
+using PadelBooking.BLL.Services.Owner;
 using PadelBooking.BLL.Services.Token;
 using PadelBooking.BLL.Services.User;
 using PadelBooking.DAL.Data;
 using PadelBooking.DAL.Repositiory.Booking;
 using PadelBooking.DAL.Repositiory.ClubRepo;
 using PadelBooking.DAL.Repositiory.CourtRepo;
+using PadelBooking.DAL.Repositiory.CourtBlockRepo;
 using PadelBooking.DAL.Repositiory.CourtScheduleRepo;
 using PadelBooking.DAL.Repositiory.NotificationRepo;
 using PadelBooking.DAL.Repositiory.RoleRepo;
@@ -71,8 +73,13 @@ namespace PadelBooking.API
             builder.Services.AddScoped<IClubRepo, ClubRepo>();
             builder.Services.AddScoped<ICourtRepo, CourtRepo>();
             builder.Services.AddScoped<ICourtScheduleRepo, CourtScheduleRepo>();
+            builder.Services.AddScoped<ICourtBlockRepo, CourtBlockRepo>();
             builder.Services.AddScoped<IBookingRepo, BookingRepo>();
             builder.Services.AddScoped<IClubService, ClubService>();
+            builder.Services.AddScoped<IOwnerClubService, OwnerClubService>();
+            builder.Services.AddScoped<IOwnerCourtService, OwnerCourtService>();
+            builder.Services.AddScoped<IOwnerReservationService, OwnerReservationService>();
+            builder.Services.AddScoped<IOwnerReportService, OwnerReportService>();
             builder.Services.AddScoped<INotificationRepo, NotificationRepo>();
             builder.Services.AddScoped<INotififcationService ,  NotificationService>();
 

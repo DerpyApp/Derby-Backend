@@ -24,5 +24,14 @@ namespace PadelBooking.DAL.Repositiory.NotificationRepo
                 .AsNoTracking()
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Notification>> GetNotificationsByUserIdAndTypeAsync(int userId, Enums.NotificationType type)
+        {
+            return await _dbset
+                .Where(n => n.UserId == userId && n.Type == type)
+                .OrderByDescending(n => n.CreatedAt)
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }

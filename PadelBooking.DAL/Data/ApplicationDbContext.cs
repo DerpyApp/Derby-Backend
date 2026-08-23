@@ -42,6 +42,8 @@ namespace PadelBooking.DAL.Data
 
         public DbSet<CourtSchedule> CourtSchedules { get; set; }
 
+        public DbSet<CourtBlock> CourtBlocks { get; set; }
+
         // Coach
         public DbSet<Coach> Coaches { get; set; }
 
@@ -94,6 +96,28 @@ namespace PadelBooking.DAL.Data
             builder.Entity<User>().ToTable("Users");
             builder.Entity<Role>().ToTable("Roles");
             builder.Entity<UserRole>().ToTable("UserRoles");
+
+            // ==========================================
+            // Club ↔ Owner (User)
+            // ==========================================
+            builder.Entity<Club>(entity =>
+            {
+                entity.HasOne(c => c.Owner)
+                      .WithMany(u => u.OwnedClubs)
+                      .HasForeignKey(c => c.OwnerId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // ==========================================
+            // CourtBlock ↔ Court
+            // ==========================================
+            builder.Entity<CourtBlock>(entity =>
+            {
+                entity.HasOne(cb => cb.Court)
+                      .WithMany(c => c.Blocks)
+                      .HasForeignKey(cb => cb.CourtId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
 
             // ==========================================
             // Match ↔ Team

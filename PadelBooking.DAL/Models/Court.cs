@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,6 +36,9 @@ public class Court
 
     public ICollection<CourtSchedule> Schedules { get; set; }
         = new HashSet<CourtSchedule>();
+
+    public ICollection<CourtBlock> Blocks { get; set; }
+        = new HashSet<CourtBlock>();
 
     public ICollection<CourtImage> Images { get; set; }
         = new HashSet<CourtImage>();

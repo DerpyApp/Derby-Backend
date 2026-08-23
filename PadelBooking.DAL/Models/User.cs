@@ -10,7 +10,7 @@ namespace PadelBooking.DAL.Models
 {
     public class User : IdentityUser<int>
     {
-        public string FullName { get; set; } = null;
+        public string FullName { get; set; } = null!;
         public Gender gender { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public string? ProfileImage { get; set; }
@@ -36,6 +36,7 @@ namespace PadelBooking.DAL.Models
         public ICollection<UserRole> UserRoles { get; set; } = new HashSet<UserRole>();
         public ICollection<TeamMember> TeamMembers { get; set; } = new HashSet<TeamMember>();
         public ICollection<FavouriteClub> FavouriteClubs { get; set; } = new HashSet<FavouriteClub>();
+        public ICollection<Club> OwnedClubs { get; set; } = new HashSet<Club>();
 
 
 

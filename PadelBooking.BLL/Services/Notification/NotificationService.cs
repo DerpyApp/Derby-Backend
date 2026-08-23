@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PadelBooking.BLL.DTOs.Notification;
+using PadelBooking.DAL.Enums;
 using PadelBooking.DAL.Models;
 using PadelBooking.DAL.Repositiory.NotificationRepo;
 
@@ -22,6 +23,23 @@ namespace PadelBooking.BLL.Services.Notification
             var notification = await _notificationRepo.GetNotificationsByUserIdAsync(userId);
             // هات كل الاشعارات الخاصة بالمستخدم دا
             var result = notification.Select(n => new NotificationDto
+            {
+                Id = n.Id,
+                Title = n.Title,
+                Body = n.Body,
+                Type = n.Type,
+                IsRead = n.IsRead,
+                CreatedAt = n.CreatedAt
+            });
+            return result;
+        }
+
+        // #42 - إشعارات الحجز الفوري بتاعة الـ owner (Type = Booking بس)
+        public async Task<IEnumerable<NotificationDto>> GetOwnerBookingNotificationsAsync(int ownerId)
+        {
+            var notifications = await _notificationRepo.GetNotificationsByUserIdAndTypeAsync(ownerId, NotificationType.Booking);
+            // هات كل إشعارات الحجوزات الخاصة بالـ owner دا، الأحدث الأول
+            var result = notifications.Select(n => new NotificationDto
             {
                 Id = n.Id,
                 Title = n.Title,

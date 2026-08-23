@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +11,8 @@ namespace PadelBooking.DAL.Models
     public class Club
     {
         public int Id { get; set; }
+
+        public int OwnerId { get; set; }
 
         public string Name { get; set; } = null!;
 
@@ -40,6 +42,8 @@ namespace PadelBooking.DAL.Models
 
 
         // Navigation Properties
+        public User Owner { get; set; } = null!;
+
 
         public ICollection<Court> Courts { get; set; }
             = new HashSet<Court>();
