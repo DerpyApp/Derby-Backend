@@ -6,13 +6,17 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PadelBooking.DAL.Data;
 using PadelBooking.API.Helpers;
+using PadelBooking.BLL.Options;
+using PadelBooking.BLL.Services.Booking;
 using PadelBooking.BLL.Services.Club;
+using PadelBooking.BLL.Services.Payment;
 using PadelBooking.BLL.Services.Token;
 using PadelBooking.BLL.Services.User;
 using PadelBooking.DAL.Repositiory.Booking;
 using PadelBooking.DAL.Repositiory.ClubRepo;
 using PadelBooking.DAL.Repositiory.CourtRepo;
 using PadelBooking.DAL.Repositiory.CourtScheduleRepo;
+using PadelBooking.DAL.Repositiory.PaymentRepo;
 using PadelBooking.DAL.Repositiory.RoleRepo;
 using PadelBooking.DAL.Repositiory.UserRepo;
 using PadelBooking.API.Middleware;
@@ -70,11 +74,15 @@ namespace PadelBooking.API
             builder.Services.AddScoped<ICourtRepo, CourtRepo>();
             builder.Services.AddScoped<ICourtScheduleRepo, CourtScheduleRepo>();
             builder.Services.AddScoped<IBookingRepo, BookingRepo>();
+            builder.Services.AddScoped<IPaymentRepo, PaymentRepo>();
             builder.Services.AddScoped<IClubService, ClubService>();
+            builder.Services.AddScoped<IBookingService, BookingService>();
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
 
-            //// 1. إضافة DbContext
-            //builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            //    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddHttpClient<IPaymobService, PaymobService>();
+
+            // Configure Paymob options
+            builder.Services.Configure<PaymobOptions>(builder.Configuration.GetSection("PaymentGateway:Paymob"));
 
             // 1. إضافة DbContext
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
