@@ -12,12 +12,14 @@ using PadelBooking.BLL.Services.Booking;
 using PadelBooking.BLL.Services.Club;
 using PadelBooking.BLL.Services.Notification;
 using PadelBooking.BLL.Services.Payment;
+using PadelBooking.BLL.Services.Owner;
 using PadelBooking.BLL.Services.Token;
 using PadelBooking.BLL.Services.User;
 using PadelBooking.DAL.Data;
 using PadelBooking.DAL.Repositiory.Booking;
 using PadelBooking.DAL.Repositiory.ClubRepo;
 using PadelBooking.DAL.Repositiory.CourtRepo;
+using PadelBooking.DAL.Repositiory.CourtBlockRepo;
 using PadelBooking.DAL.Repositiory.CourtScheduleRepo;
 using PadelBooking.DAL.Repositiory.NotificationRepo;
 using PadelBooking.DAL.Repositiory.PaymentRepo;
@@ -76,6 +78,7 @@ namespace PadelBooking.API
             builder.Services.AddScoped<IClubRepo, ClubRepo>();
             builder.Services.AddScoped<ICourtRepo, CourtRepo>();
             builder.Services.AddScoped<ICourtScheduleRepo, CourtScheduleRepo>();
+            builder.Services.AddScoped<ICourtBlockRepo, CourtBlockRepo>();
             builder.Services.AddScoped<IBookingRepo, BookingRepo>();
             builder.Services.AddScoped<IPaymentRepo, PaymentRepo>();
             builder.Services.AddScoped<INotificationRepo, NotificationRepo>();
@@ -87,6 +90,12 @@ namespace PadelBooking.API
             builder.Services.AddScoped<IPaymentService, PaymentService>();
 
             builder.Services.AddHttpClient<IPaymobService, PaymobService>();
+            builder.Services.AddScoped<IOwnerClubService, OwnerClubService>();
+            builder.Services.AddScoped<IOwnerCourtService, OwnerCourtService>();
+            builder.Services.AddScoped<IOwnerReservationService, OwnerReservationService>();
+            builder.Services.AddScoped<IOwnerReportService, OwnerReportService>();
+            builder.Services.AddScoped<INotificationRepo, NotificationRepo>();
+            builder.Services.AddScoped<INotififcationService ,  NotificationService>();
 
             // Configure Paymob options
             builder.Services.Configure<PaymobOptions>(builder.Configuration.GetSection("PaymentGateway:Paymob"));

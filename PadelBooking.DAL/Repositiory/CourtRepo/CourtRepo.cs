@@ -28,5 +28,14 @@ namespace PadelBooking.DAL.Repositiory.CourtRepo
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Id == courtId);
         }
+
+        public async Task<IEnumerable<Court>> GetCourtsByOwnerAsync(int ownerId)
+        {
+            return await _dbset
+                .Include(c => c.Club)
+                .Where(c => c.Club.OwnerId == ownerId)
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }

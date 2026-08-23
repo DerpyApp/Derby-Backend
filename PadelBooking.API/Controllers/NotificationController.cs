@@ -33,6 +33,20 @@ namespace PadelBooking.API.Controllers
             return Ok(result);
         }
 
+        // GET: /api/notifications/owner-booking
+        [HttpGet("owner-booking")]
+        public async Task<IActionResult> GetOwnerBookingNotifications()
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            var result = await _notificationService.GetOwnerBookingNotificationsAsync(userId);
+            return Ok(result);
+        }
+
         // PUT: /api/notifications/{id}/read
         [HttpPut("{id:int}/read")]
         public async Task<IActionResult> MarkAsRead(int id)

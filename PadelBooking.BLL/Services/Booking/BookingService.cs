@@ -10,6 +10,7 @@ using PadelBooking.DAL.Data;
 using PadelBooking.DAL.Enums;
 using PadelBooking.DAL.Repositiory.Booking;
 using PadelBooking.DAL.Repositiory.ClubRepo;
+using PadelBooking.DAL.Repositiory.CourtBlockRepo;
 using PadelBooking.DAL.Repositiory.CourtRepo;
 using PadelBooking.DAL.Repositiory.CourtScheduleRepo;
 using PadelBooking.DAL.Repositiory.PaymentRepo;
@@ -23,6 +24,7 @@ namespace PadelBooking.BLL.Services.Booking
         private readonly ICourtRepo _courtRepo;
         private readonly ICourtScheduleRepo _courtScheduleRepo;
         private readonly IPaymentRepo _paymentRepo;
+        private readonly ICourtBlockRepo _courtBlockRepo;
         private readonly ApplicationDbContext _dbContext;
 
         public BookingService(
@@ -31,6 +33,7 @@ namespace PadelBooking.BLL.Services.Booking
             ICourtRepo courtRepo,
             ICourtScheduleRepo courtScheduleRepo,
             IPaymentRepo paymentRepo,
+            ICourtBlockRepo courtBlockRepo,
             ApplicationDbContext dbContext)
         {
             _bookingRepo = bookingRepo;
@@ -38,6 +41,7 @@ namespace PadelBooking.BLL.Services.Booking
             _courtRepo = courtRepo;
             _courtScheduleRepo = courtScheduleRepo;
             _paymentRepo = paymentRepo;
+            _courtBlockRepo = courtBlockRepo;
             _dbContext = dbContext;
         }
 
@@ -80,7 +84,22 @@ namespace PadelBooking.BLL.Services.Booking
                 throw new BadRequestException("This court isn't available.");
             }
 
-            // Get the court schedule for this day
+            // check if the slot is already booked
+            var isBooked = await _bookingRepo.IsSlotBookedAsync(dto.CourtId,
+                dto.Date, dto.StartTime, dto.EndTime);
+            if (isBooked)
+            {
+                throw new ConflictException("This time slot is already booked.");
+            }
+
+            var isBlocked = await _courtBlockRepo.IsBlockedAsync(
+                dto.CourtId, dto.Date, dto.StartTime, dto.EndTime);
+            if (isBlocked)
+            {
+                throw new ConflictException("This time slot is blocked by the club and isn't available.");
+            }
+
+            // get the court schedule for this day
             var schedule = await _courtScheduleRepo.GetCourtScheduleByDayAsync(
                 dto.CourtId, dto.Date.DayOfWeek);
             if (schedule == null)

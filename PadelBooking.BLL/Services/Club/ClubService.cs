@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using PadelBooking.BLL.DTOs.ClubDTOs;
 using PadelBooking.DAL.Repositiory.Booking;
 using PadelBooking.DAL.Repositiory.ClubRepo;
+using PadelBooking.DAL.Repositiory.CourtBlockRepo;
 using PadelBooking.DAL.Repositiory.CourtRepo;
 using PadelBooking.DAL.Repositiory.CourtScheduleRepo;
 
@@ -16,17 +17,20 @@ namespace PadelBooking.BLL.Services.Club
         private readonly ICourtRepo _courtRepo;
         private readonly ICourtScheduleRepo _courtScheduleRepo;
         private readonly IBookingRepo _bookingRepo;
+        private readonly ICourtBlockRepo _courtBlockRepo;
 
         public ClubService(
             IClubRepo clubRepo,
             ICourtRepo courtRepo,
             ICourtScheduleRepo courtScheduleRepo,
-            IBookingRepo bookingRepo)
+            IBookingRepo bookingRepo,
+            ICourtBlockRepo courtBlockRepo)
         {
             _clubRepo = clubRepo;
             _courtRepo = courtRepo;
             _courtScheduleRepo = courtScheduleRepo;
             _bookingRepo = bookingRepo;
+            _courtBlockRepo = courtBlockRepo;
         }
 
         public async Task<IEnumerable<ClubSearchResponseDto>> FilterClubAsync(ClubFilterRequestDto dto)
@@ -168,6 +172,7 @@ namespace PadelBooking.BLL.Services.Club
                     }
 
                     var isBooked = await _bookingRepo.IsSlotBookedAsync(court.Id, date, currentTime, slotEndTime);
+                    var isBlocked = _courtBlockRepo != null ? await _courtBlockRepo.IsBlockedAsync(court.Id, date, currentTime, slotEndTime) : false;
 
                     availability.Add(new CourtAvailabilityDto
                     {
@@ -175,7 +180,7 @@ namespace PadelBooking.BLL.Services.Club
                         CourtName = court.Name,
                         StartTime = currentTime,
                         EndTime = slotEndTime,
-                        IsAvailable = !isBooked,
+                        IsAvailable = !isBooked && !isBlocked,
                         Price = court.PricePerHour,
                         Deposit = court.PricePerHour * 0.5m
                     });

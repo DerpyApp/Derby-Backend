@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PadelBooking.DAL.Data;
+using PadelBooking.DAL.Enums;
 using PadelBooking.DAL.Models;
 using PadelBooking.DAL.Repositiory.GenericRepo;
 
@@ -18,6 +19,15 @@ namespace PadelBooking.DAL.Repositiory.NotificationRepo
         {
             return await _dbset
                 .Where(n => n.UserId == userId)
+                .OrderByDescending(n => n.CreatedAt)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Notification>> GetNotificationsByUserIdAndTypeAsync(int userId, NotificationType type)
+        {
+            return await _dbset
+                .Where(n => n.UserId == userId && n.Type == type)
                 .OrderByDescending(n => n.CreatedAt)
                 .AsNoTracking()
                 .ToListAsync();

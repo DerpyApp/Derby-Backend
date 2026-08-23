@@ -9,5 +9,8 @@ namespace PadelBooking.DAL.Repositiory.CourtRepo
         Task<IEnumerable<Court>> GetCourtsByClubAsync(int clubId);
 
         Task<Court?> GetCourtWithClubAsync(int courtId);
+
+        // #41 - كل ملاعب الأندية اللي بتاعة الـ owner، لعد الملاعب في الداشبورد
+        Task<IEnumerable<Court>> GetCourtsByOwnerAsync(int ownerId);
     }
 }

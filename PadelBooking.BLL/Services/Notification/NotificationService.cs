@@ -125,5 +125,22 @@ namespace PadelBooking.BLL.Services.Notification
 
             return dto;
         }
+
+        // #42 - إشعارات الحجز الفوري بتاعة الـ owner (Type = Booking بس)
+        public async Task<IEnumerable<NotificationDto>> GetOwnerBookingNotificationsAsync(int ownerId)
+        {
+            var notifications = await _notificationRepo.GetNotificationsByUserIdAndTypeAsync(ownerId, NotificationType.Booking);
+            // هات كل إشعارات الحجوزات الخاصة بالـ owner دا، الأحدث الأول
+            var result = notifications.Select(n => new NotificationDto
+            {
+                Id = n.Id,
+                Title = n.Title,
+                Body = n.Body,
+                Type = n.Type,
+                IsRead = n.IsRead,
+                CreatedAt = n.CreatedAt
+            });
+            return result;
+        }
     }
 }

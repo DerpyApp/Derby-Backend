@@ -8,6 +8,7 @@ namespace PadelBooking.BLL.Services.Notification
     public interface INotificationService
     {
         Task<IEnumerable<NotificationDto>> GetMyNotificationAsync(int userId);
+        Task<IEnumerable<NotificationDto>> GetOwnerBookingNotificationsAsync(int ownerId);
         Task MarkAsReadAsync(int notificationId, int userId);
         Task MarkAllAsReadAsync(int userId);
         Task DeleteNotificationAsync(int notificationId, int userId);

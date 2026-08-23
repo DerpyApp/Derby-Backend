@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PadelBooking.DAL.Data;
 using PadelBooking.DAL.Models;
 using PadelBooking.DAL.Repositiory.GenericRepo;
@@ -15,7 +15,7 @@ namespace PadelBooking.DAL.Repositiory.ClubRepo
         public async Task<IEnumerable<Club>> GetClubByOwnerAsync(int ownerId)
         {
             return await _dbset
-                .Where(c => c.Id == ownerId)
+                .Where(c => c.OwnerId == ownerId)
                 .AsNoTracking()
                 .ToListAsync();
         }
