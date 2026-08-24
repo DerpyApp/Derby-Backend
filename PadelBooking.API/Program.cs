@@ -1,4 +1,3 @@
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -8,23 +7,26 @@ using PadelBooking.API.Helpers;
 using PadelBooking.API.Hubs;
 using PadelBooking.API.Middleware;
 using PadelBooking.BLL.Options;
+using PadelBooking.BLL.Services.Admin;
 using PadelBooking.BLL.Services.Booking;
 using PadelBooking.BLL.Services.Club;
 using PadelBooking.BLL.Services.Notification;
-using PadelBooking.BLL.Services.Payment;
 using PadelBooking.BLL.Services.Owner;
+using PadelBooking.BLL.Services.Payment;
 using PadelBooking.BLL.Services.Token;
 using PadelBooking.BLL.Services.User;
 using PadelBooking.DAL.Data;
 using PadelBooking.DAL.Repositiory.Booking;
 using PadelBooking.DAL.Repositiory.ClubRepo;
-using PadelBooking.DAL.Repositiory.CourtRepo;
 using PadelBooking.DAL.Repositiory.CourtBlockRepo;
+using PadelBooking.DAL.Repositiory.CourtRepo;
 using PadelBooking.DAL.Repositiory.CourtScheduleRepo;
 using PadelBooking.DAL.Repositiory.NotificationRepo;
+using PadelBooking.DAL.Repositiory.OfferRepo;
 using PadelBooking.DAL.Repositiory.PaymentRepo;
 using PadelBooking.DAL.Repositiory.RoleRepo;
 using PadelBooking.DAL.Repositiory.UserRepo;
+using System.Text;
 
 namespace PadelBooking.API
 {
@@ -106,6 +108,8 @@ namespace PadelBooking.API
             builder.Services.AddScoped<IOwnerReportService, OwnerReportService>();
             builder.Services.AddScoped<INotificationRepo, NotificationRepo>();
             builder.Services.AddScoped<INotififcationService ,  NotificationService>();
+            builder.Services.AddScoped<IAdminService, AdminService>();
+            builder.Services.AddScoped<IOfferRepo, OfferRepo>();
 
             // Configure Paymob options
             builder.Services.Configure<PaymobOptions>(builder.Configuration.GetSection("PaymentGateway:Paymob"));

@@ -42,6 +42,27 @@ namespace PadelBooking.API.Controllers
             return Ok(result);
         }
 
+
+        // put // api/user/update-profile
+        [Authorize]
+        [HttpPut("profile")]
+        public async Task<IActionResult> UpdateProfile(UpdateProfileDto dto)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if(userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            var userId = int.Parse(userIdClaim.Value);
+            await _userService.UpdateProfileAsync(userId, dto);
+
+            return Ok(new
+            {
+                message = "Profile Updated successfully"
+            });
+        }
+
         // Post : api/User/Logout
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()

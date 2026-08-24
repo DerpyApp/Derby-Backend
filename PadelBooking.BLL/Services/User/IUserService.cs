@@ -15,5 +15,6 @@ namespace PadelBooking.BLL.Services.User
         Task LogoutAsync(int userId);
         Task ForgotPasswordAsync(ForgotPasswordDto dto);
         Task ResetPasswordAsync(ResetPasswordDto dto);
+        Task UpdateProfileAsync(int userId, UpdateProfileDto dto);
     }
 }

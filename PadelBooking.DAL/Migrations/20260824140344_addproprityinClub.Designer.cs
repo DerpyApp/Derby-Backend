@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PadelBooking.DAL.Data;
 
@@ -11,9 +12,11 @@ using PadelBooking.DAL.Data;
 namespace PadelBooking.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260824140344_addproprityinClub")]
+    partial class addproprityinClub
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -662,246 +665,6 @@ namespace PadelBooking.DAL.Migrations
                     b.HasIndex("OwnerId");
 
                     b.ToTable("Clubs");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Address = "Katameya Heights Compound, Madinaty, El Rehab Compound, New Cairo",
-                            CloseTime = new TimeSpan(0, 0, 0, 0, 0),
-                            CreatedAt = new DateTime(2026, 8, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "1 hour for 350 EGP, 2 hours for 600 EGP per player",
-                            Latitude = 0m,
-                            Longitude = 0m,
-                            Name = "Go Padel",
-                            OpenTime = new TimeSpan(0, 10, 0, 0, 0),
-                            OwnerId = 1,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Address = "Mountain View Hyde Park, New Cairo",
-                            CloseTime = new TimeSpan(0, 23, 0, 0, 0),
-                            CreatedAt = new DateTime(2026, 8, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "1 hour for 250 EGP per player",
-                            Latitude = 0m,
-                            Longitude = 0m,
-                            Name = "Cairo Padel",
-                            OpenTime = new TimeSpan(0, 9, 0, 0, 0),
-                            OwnerId = 1,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Address = "Swan Lake Residence, New Cairo",
-                            CloseTime = new TimeSpan(0, 0, 0, 0, 0),
-                            CreatedAt = new DateTime(2026, 8, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "1 hour for 300 EGP per player",
-                            Latitude = 0m,
-                            Longitude = 0m,
-                            Name = "J Padel",
-                            OpenTime = new TimeSpan(0, 8, 0, 0, 0),
-                            OwnerId = 1,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Address = "The Field Maadi, Maadi",
-                            CloseTime = new TimeSpan(0, 0, 0, 0, 0),
-                            CreatedAt = new DateTime(2026, 8, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "1 hour for 360 EGP per player",
-                            Latitude = 0m,
-                            Longitude = 0m,
-                            Name = "SR Padel Club 7",
-                            OpenTime = new TimeSpan(0, 8, 0, 0, 0),
-                            OwnerId = 1,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Address = "Maadi Club, Maadi",
-                            CloseTime = new TimeSpan(0, 23, 0, 0, 0),
-                            CreatedAt = new DateTime(2026, 8, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "2400 EGP per player for a group of 3 during 8 sessions per month / 2 sessions per week / 1 hour per session",
-                            Latitude = 0m,
-                            Longitude = 0m,
-                            Name = "Pro Padel Maadi",
-                            OpenTime = new TimeSpan(0, 9, 0, 0, 0),
-                            OwnerId = 1,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Address = "Street 250 Maadi, Maadi",
-                            CloseTime = new TimeSpan(0, 0, 0, 0, 0),
-                            CreatedAt = new DateTime(2026, 8, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Around 300 EGP per hour per player",
-                            Latitude = 0m,
-                            Longitude = 0m,
-                            Name = "Padel Up Elite",
-                            OpenTime = new TimeSpan(0, 9, 0, 0, 0),
-                            OwnerId = 1,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Address = "Talaaea Sporting Club, Nasr City, Cairo",
-                            CloseTime = new TimeSpan(0, 3, 0, 0, 0),
-                            CreatedAt = new DateTime(2026, 8, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Average of 400 EGP per hour for one person",
-                            Latitude = 0m,
-                            Longitude = 0m,
-                            Name = "Padel Point",
-                            OpenTime = new TimeSpan(0, 6, 0, 0, 0),
-                            OwnerId = 1,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Address = "Almazah, Heliopolis, Cairo",
-                            CloseTime = new TimeSpan(0, 2, 0, 0, 0),
-                            CreatedAt = new DateTime(2026, 8, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "One hour for 250 EGP per player",
-                            Latitude = 0m,
-                            Longitude = 0m,
-                            Name = "The Padel Zone",
-                            OpenTime = new TimeSpan(0, 10, 0, 0, 0),
-                            OwnerId = 1,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Address = "El Shorouk City, Cairo",
-                            CloseTime = new TimeSpan(0, 2, 0, 0, 0),
-                            CreatedAt = new DateTime(2026, 8, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Average of 300 EGP per hour for the player",
-                            Latitude = 0m,
-                            Longitude = 0m,
-                            Name = "Padel Co.",
-                            OpenTime = new TimeSpan(0, 12, 0, 0, 0),
-                            OwnerId = 1,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Address = "Dreamland, 6 October",
-                            CloseTime = new TimeSpan(0, 23, 59, 59, 0),
-                            CreatedAt = new DateTime(2026, 8, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "400 EGP per hour per player",
-                            Latitude = 0m,
-                            Longitude = 0m,
-                            Name = "Padel Beats",
-                            OpenTime = new TimeSpan(0, 0, 0, 0, 0),
-                            OwnerId = 1,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Address = "Six Ten Park, 6 October",
-                            CloseTime = new TimeSpan(0, 23, 59, 59, 0),
-                            CreatedAt = new DateTime(2026, 8, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "One hour for 500 EGP per player",
-                            Latitude = 0m,
-                            Longitude = 0m,
-                            Name = "Padel House",
-                            OpenTime = new TimeSpan(0, 0, 0, 0, 0),
-                            OwnerId = 1,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Address = "26th of July Corridor, First 6th of October",
-                            CloseTime = new TimeSpan(0, 23, 59, 59, 0),
-                            CreatedAt = new DateTime(2026, 8, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "1 hour for 350 EGP per person",
-                            Latitude = 0m,
-                            Longitude = 0m,
-                            Name = "Mexico Padel",
-                            OpenTime = new TimeSpan(0, 0, 0, 0, 0),
-                            OwnerId = 1,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 13,
-                            Address = "Inside Galleria 40, El Sheikh Zayed",
-                            CloseTime = new TimeSpan(0, 1, 0, 0, 0),
-                            CreatedAt = new DateTime(2026, 8, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Around 400 EGP per person per hour",
-                            Latitude = 0m,
-                            Longitude = 0m,
-                            Name = "The Padel Club",
-                            OpenTime = new TimeSpan(0, 6, 0, 0, 0),
-                            OwnerId = 1,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 14,
-                            Address = "Arkan Plaza, El Sheikh Zayed",
-                            CloseTime = new TimeSpan(0, 1, 0, 0, 0),
-                            CreatedAt = new DateTime(2026, 8, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "One hour for 400 EGP per person",
-                            Latitude = 0m,
-                            Longitude = 0m,
-                            Name = "Padel It",
-                            OpenTime = new TimeSpan(0, 8, 0, 0, 0),
-                            OwnerId = 1,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 15,
-                            Address = "El Seginy Riding Club, El Sheikh Zayed",
-                            CloseTime = new TimeSpan(0, 23, 59, 59, 0),
-                            CreatedAt = new DateTime(2026, 8, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Around 300 EGP per hour for one player",
-                            Latitude = 0m,
-                            Longitude = 0m,
-                            Name = "Pro Padel",
-                            OpenTime = new TimeSpan(0, 0, 0, 0, 0),
-                            OwnerId = 1,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 16,
-                            Address = "63 Abu Taqia St Therese, Shubra, Egypt",
-                            CloseTime = new TimeSpan(0, 0, 0, 0, 0),
-                            CreatedAt = new DateTime(2026, 8, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "250 EGP",
-                            Latitude = 0m,
-                            Longitude = 0m,
-                            Name = "Combat Station for Padel and Skating",
-                            OpenTime = new TimeSpan(0, 12, 0, 0, 0),
-                            OwnerId = 1,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 17,
-                            Address = "Dakhlia Sporting Club October Branch, Al Jizah",
-                            CloseTime = new TimeSpan(0, 23, 0, 0, 0),
-                            CreatedAt = new DateTime(2026, 8, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "300 EGP",
-                            Latitude = 0m,
-                            Longitude = 0m,
-                            Name = "Golden Padel",
-                            OpenTime = new TimeSpan(0, 8, 0, 0, 0),
-                            OwnerId = 1,
-                            Status = 1
-                        });
                 });
 
             modelBuilder.Entity("PadelBooking.DAL.Models.CoachBooking", b =>
