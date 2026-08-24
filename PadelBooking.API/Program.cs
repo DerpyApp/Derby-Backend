@@ -39,13 +39,14 @@ namespace PadelBooking.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSignalR();
 
-            builder.Services.AddCors(opt =>
+            builder.Services.AddCors(options =>
             {
-                opt.AddDefaultPolicy(o =>
-                    o.AllowAnyOrigin()
-                     .AllowAnyHeader()
-                     .AllowAnyMethod()
-                );
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
             });
 
             builder.Services.AddSwaggerGen(options =>
@@ -55,11 +56,11 @@ namespace PadelBooking.API
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
                     BearerFormat = "JWT",
                     In = ParameterLocation.Header,
-                    Description = "ادخلي التوكن بالصيغة التالية: Bearer YOUR_TOKEN"
+                    Description = "ادخلي التوكن فقط (بدون كلمة Bearer) في الحقل أدناه."
                 });
 
                 options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -146,6 +147,11 @@ namespace PadelBooking.API
                 };
                 options.Events = new JwtBearerEvents
                 {
+                    OnAuthenticationFailed = context =>
+                    {
+                        Console.WriteLine($"JWT Authentication failed: {context.Exception.Message}");
+                        return Task.CompletedTask;
+                    },
                     OnMessageReceived = context =>
                     {
                         var accessToken = context.Request.Query["access_token"];
@@ -167,9 +173,9 @@ namespace PadelBooking.API
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            app.UseHttpsRedirection();
+            app.UseCors("AllowAll");
 
-            app.UseCors();
+            app.UseHttpsRedirection();
 
             app.UseAuthentication();
             app.UseAuthorization();

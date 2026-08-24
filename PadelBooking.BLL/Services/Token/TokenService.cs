@@ -33,11 +33,9 @@ namespace PadelBooking.BLL.Services.Token
 
             var claims = new List<Claim>
             {
-                new Claim(
-                    JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-
-                new Claim(
-                    JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
 
             foreach (var role in roles)
@@ -59,7 +57,9 @@ namespace PadelBooking.BLL.Services.Token
                 signingCredentials: credentials
             );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            tokenHandler.OutboundClaimTypeMap.Clear();
+            return tokenHandler.WriteToken(token);
         }
 
         public string GenerateRefreshToken()
