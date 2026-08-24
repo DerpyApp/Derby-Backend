@@ -461,6 +461,8 @@ namespace PadelBooking.DAL.Data
                       .HasForeignKey(p => p.UserId)
                       .OnDelete(DeleteBehavior.Restrict);
             });
+            // seed clubs
+            ClubSeedData.Seed(builder);
 
         }
     }

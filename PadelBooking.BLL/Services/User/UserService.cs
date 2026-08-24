@@ -8,6 +8,7 @@ using PadelBooking.BLL.Exceptions;
 using PadelBooking.BLL.Services.Token;
 using PadelBooking.DAL.Models;
 
+
 namespace PadelBooking.BLL.Services.User
 {
     public class UserService : IUserService
@@ -252,6 +253,30 @@ namespace PadelBooking.BLL.Services.User
             user.PasswordResetTokenExpiryTime = null;
 
             await _userManager.UpdateAsync(user);
+        }
+
+        public async Task UpdateProfileAsync(int userId, UpdateProfileDto dto)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                throw new Exception("User not found.");
+            }
+
+            user.FullName = dto.FullName;
+            user.Email = dto.Email;
+            user.UserName = dto.Email;
+            user.NormalizedEmail = dto.Email.ToUpper();
+            user.NormalizedUserName = dto.Email.ToUpper();
+            user.PhoneNumber = dto.PhoneNumber;
+            user.DateOfBirth = dto.DateOfBirth;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new Exception($"Failed to update profile: {errors}");
+            }
         }
     }
 }
