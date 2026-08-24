@@ -85,7 +85,13 @@ namespace PadelBooking.BLL.Services.Club
                 });
             }
 
-            return result;
+            return result
+                .OrderByDescending(r =>
+                {
+                    var club = clubs.First(c => c.Id == r.Id);
+                    return club.IsFeatured;
+                })
+                .ToList();
         }
 
         public async Task<IEnumerable<CourtDto>> GetClubCourtsAsync(int clubId)
@@ -108,6 +114,7 @@ namespace PadelBooking.BLL.Services.Club
         public async Task<ClubDetailsDto?> GetClubDetailsAsync(int clubId)
         {
             var club = await _clubRepo.GetClubWithCourtsAsync(clubId);
+
             if (club == null)
                 return null;
 
@@ -223,7 +230,14 @@ namespace PadelBooking.BLL.Services.Club
                 }
             }
 
-            return searchResults.OrderBy(r => r.DistanceKm);
+            return searchResults
+                .OrderByDescending(r =>
+                {
+                    var club = clubs.First(c => c.Id == r.Id);
+                    return club.IsFeatured;
+                })
+                .ThenBy(r => r.DistanceKm)
+                .ToList();
         }
 
         private static double CalculateDistance(
