@@ -23,6 +23,7 @@ namespace PadelBooking.DAL.Models
         public string? PhoneNumber { get; set; }
 
         public string? Email { get; set; }
+        public bool IsFeatured { get; set; } = false;
 
         public decimal Latitude { get; set; }
 
